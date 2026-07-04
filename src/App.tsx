@@ -1,34 +1,39 @@
+import { useState } from "react";
 import "./App.css";
 
+import Dashboard from "./pages/Dashboard";
+import Portfolio from "./pages/Portfolio";
+
 function App() {
+  const [page, setPage] = useState("dashboard");
+
   return (
     <div className="app">
-      <header className="header">
-        <h1>JAMOS</h1>
-        <p>JAMI Lite Investment Assistant</p>
-      </header>
 
-      <main className="dashboard">
-        <div className="card">
-          <h2>Market Score</h2>
-          <span>--</span>
-        </div>
+      {page === "dashboard" && <Dashboard />}
 
-        <div className="card">
-          <h2>Portfolio</h2>
-          <span>0 종목</span>
-        </div>
+      {page === "portfolio" && <Portfolio />}
 
-        <div className="card">
-          <h2>Watchlist</h2>
-          <span>0 종목</span>
-        </div>
+      <nav className="bottomNav">
 
-        <div className="card">
-          <h2>JAMI Lite</h2>
-          <p>안녕하세요. 무엇을 분석해드릴까요?</p>
-        </div>
-      </main>
+        <button
+          className={page === "dashboard" ? "active" : ""}
+          onClick={() => setPage("dashboard")}
+        >
+          🏠
+          <span>Home</span>
+        </button>
+
+        <button
+          className={page === "portfolio" ? "active" : ""}
+          onClick={() => setPage("portfolio")}
+        >
+          📈
+          <span>Portfolio</span>
+        </button>
+
+      </nav>
+
     </div>
   );
 }
