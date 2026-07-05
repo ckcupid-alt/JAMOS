@@ -1,16 +1,9 @@
+import Header from "../components/Header";
+
 function Dashboard() {
   return (
     <>
-      <header className="header">
-        <div>
-          <h1>JAMOS</h1>
-          <p>JAMI Lite Investment Assistant</p>
-        </div>
-
-        <button className="profileBtn">
-          👤
-        </button>
-      </header>
+      <Header />
 
       <section className="summary">
 
@@ -30,31 +23,20 @@ function Dashboard() {
 
       <section className="menu">
 
-        <button>
-          📈 Portfolio
-        </button>
+        <button>📈 Portfolio</button>
 
-        <button>
-          ⭐ Watchlist
-        </button>
+        <button>⭐ Watchlist</button>
 
-        <button>
-          🌍 Market
-        </button>
+        <button>🌍 Market</button>
 
-        <button>
-          📊 Statistics
-        </button>
+        <button>📊 Statistics</button>
 
-        <button>
-          🤖 JAMI Lite
-        </button>
+        <button>🤖 JAMI Lite</button>
 
-        <button>
-          ⚙ Settings
-        </button>
+        <button>⚙ Settings</button>
 
       </section>
+
     </>
   );
 }

@@ -1,125 +1,144 @@
-import { useState } from "react";
-import { Stock } from "../types/Stock";
+import { useMemo, useState } from "react";
+import type { Stock } from "../types/Stock";
+
+import SummaryCard from "../components/SummaryCard";
+import StockCard from "../components/StockCard";
+import StockSearch from "../components/StockSearch";
+
+import { searchMarket } from "../services/marketData";
+import { usePortfolio } from "../hooks/usePortfolio";
 
 function Portfolio() {
-  const [stocks, setStocks] = useState<Stock[]>([]);
+  const {
+    stocks,
+    addStock,
+    deleteStock,
+  } = usePortfolio();
 
-  const [name, setName] = useState("");
+  const [keyword, setKeyword] = useState("");
+  const [selectedCode, setSelectedCode] = useState("");
+
   const [averagePrice, setAveragePrice] = useState("");
   const [quantity, setQuantity] = useState("");
 
-  const addStock = () => {
-    if (!name || !averagePrice || !quantity) {
+  function selectStock(name: string) {
+    const stock = searchMarket(name)[0];
+
+    if (!stock) return;
+
+    setKeyword(stock.name);
+    setSelectedCode(stock.code);
+  }
+
+  function handleAddStock() {
+    if (
+      !selectedCode ||
+      !keyword ||
+      !averagePrice ||
+      !quantity
+    ) {
       alert("모든 항목을 입력하세요.");
       return;
     }
 
     const stock: Stock = {
       id: Date.now(),
-      name,
+      code: selectedCode,
+      name: keyword,
       averagePrice: Number(averagePrice),
       quantity: Number(quantity),
     };
 
-    setStocks([...stocks, stock]);
+    addStock(stock);
 
-    setName("");
+    setKeyword("");
+    setSelectedCode("");
     setAveragePrice("");
     setQuantity("");
-  };
+  }
 
-  const removeStock = (id: number) => {
-    setStocks(stocks.filter((s) => s.id !== id));
-  };
+  const totalBuy = useMemo(() => {
+    return stocks.reduce(
+      (sum, stock) =>
+        sum + stock.averagePrice * stock.quantity,
+      0
+    );
+  }, [stocks]);
+
+  // 현재는 임시 계산
+  // Release3에서 실시간 시세 API로 교체
+  const totalEvaluation = useMemo(() => {
+    return stocks.reduce(
+      (sum, stock) =>
+        sum +
+        Math.round(stock.averagePrice * 1.05) *
+          stock.quantity,
+      0
+    );
+  }, [stocks]);
 
   return (
     <div className="page">
 
-      <h1>📈 Portfolio</h1>
+      <SummaryCard
+        buyAmount={totalBuy}
+        evaluationAmount={totalEvaluation}
+      />
 
       <div className="card">
 
+        <h2>종목 추가</h2>
+
         <input
-          placeholder="종목명"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          placeholder="종목 검색"
+          value={keyword}
+          onChange={(e) => {
+            setKeyword(e.target.value);
+            setSelectedCode("");
+          }}
+        />
+
+        <StockSearch
+          keyword={keyword}
+          onSelect={selectStock}
         />
 
         <input
           type="number"
           placeholder="평단가"
           value={averagePrice}
-          onChange={(e) => setAveragePrice(e.target.value)}
+          onChange={(e) =>
+            setAveragePrice(e.target.value)
+          }
         />
 
         <input
           type="number"
           placeholder="보유수량"
           value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
+          onChange={(e) =>
+            setQuantity(e.target.value)
+          }
         />
 
-        <button onClick={addStock}>
-          + 종목 추가
+        <button onClick={handleAddStock}>
+          종목 추가
         </button>
 
       </div>
 
-      <br />
-
       {stocks.length === 0 ? (
-        <p>등록된 종목이 없습니다.</p>
+        <div className="card">
+          등록된 종목이 없습니다.
+        </div>
       ) : (
-        stocks.map((stock) => {
-
-          const buyAmount =
-            stock.averagePrice * stock.quantity;
-
-          return (
-
-            <div className="card" key={stock.id}>
-
-              <h2>{stock.name}</h2>
-
-              <p>
-                평단가 :
-                {" "}
-                {stock.averagePrice.toLocaleString()}원
-              </p>
-
-              <p>
-                보유수량 :
-                {" "}
-                {stock.quantity.toLocaleString()}주
-              </p>
-
-              <p
-                style={{
-                  marginTop: "10px",
-                  fontWeight: "bold",
-                  color: "#22c55e",
-                }}
-              >
-                총 매수금액 :
-                {" "}
-                {buyAmount.toLocaleString()}원
-              </p>
-
-              <button
-                style={{
-                  background: "#ef4444",
-                  marginTop: "15px",
-                }}
-                onClick={() => removeStock(stock.id)}
-              >
-                삭제
-              </button>
-
-            </div>
-
-          );
-
-        })
+        stocks.map((stock) => (
+          <StockCard
+            key={stock.id}
+            stock={stock}
+            onDelete={deleteStock}
+          />
+        ))
       )}
 
     </div>
