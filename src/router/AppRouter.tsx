@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import MainLayout from "../layouts/MainLayout";
+import Layout from "../layout/Layout";
 
 import Home from "../pages/Home";
 import Portfolio from "../pages/Portfolio";
@@ -8,12 +8,13 @@ import Watchlist from "../pages/Watchlist";
 import Market from "../pages/Market";
 import AI from "../pages/AI";
 import Settings from "../pages/Settings";
+import Statistics from "../pages/Statistics";
 
 export default function AppRouter() {
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        <Route index element={<Home />} />
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
 
         <Route path="/portfolio" element={<Portfolio />} />
 
@@ -23,10 +24,12 @@ export default function AppRouter() {
 
         <Route path="/ai" element={<AI />} />
 
-        <Route path="/settings" element={<Settings />} />
-      </Route>
+        <Route path="/statistics" element={<Statistics />} />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route path="/settings" element={<Settings />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
   );
 }
